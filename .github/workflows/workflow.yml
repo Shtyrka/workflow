@@ -1,16 +1,35 @@
-name: My Target Workflow
+name: Secure Deployment Workflow
 
 on:
-  repository_dispatch:
-    types: [trigger-workflow]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment (staging or production)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+           - staging 
+           - production
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
+    # Use the input to determine which environment to deploy to.
+    # If "production" is selected, and your repository settings require approvals for production,
+    # the job will pause until approved.
+    environment:
+      name: ${{ github.event.inputs.environment }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Run test
-        run: echo "test"
+        uses: actions/checkout@v3
+
+      - name: Display deployment environment
+        run: echo "Deploying to ${{ github.event.inputs.environment }} environment."
+
+      - name: Simulate deployment
+        run: |
+          # Here, add your actual deployment commands.
+          echo "Deploying application..."
+          sleep 5
+          echo "Deployment complete."
